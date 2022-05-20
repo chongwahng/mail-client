@@ -1,0 +1,151 @@
+_schema-version: "3.1"
+ID: mail-client
+description: A simple CAP project.
+version: 1.0.0
+modules:
+- name: mail-client-srv
+  type: nodejs
+  path: gen/srv
+  properties:
+    GRAPH_API_DESTNAME: Microsoft_Graph_Mail_API
+  requires:
+  - name: mail-client-db
+  - name: mail-client-uaa
+  - name: mail-client-destination-service
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+  build-parameters:
+    builder: npm-ci
+- name: mail-client-db-deployer
+  type: hdb
+  path: gen/db
+  requires:
+  - name: mail-client-db
+  parameters:
+    buildpack: nodejs_buildpack
+- name: mail-client-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: mail-client-repo-host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - cngcommanagemail.zip
+      name: cngcommanagemail
+      target-path: resources/
+    - artifacts:
+      - cngcommanagewhitelist.zip
+      name: cngcommanagewhitelist
+      target-path: resources/
+- name: cngcommanagemail
+  type: html5
+  path: app/manage-mail
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: cngcommanagewhitelist
+  type: html5
+  path: app/manage-whitelist
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: mail-client-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: mail-client-destination-service
+    parameters:
+      content-target: true
+  - name: mail-client-repo-host
+    parameters:
+      service-key:
+        name: mail-client-repo-host-key
+  - name: mail-client-uaa
+    parameters:
+      service-key:
+        name: mail-client-uaa-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: approuter_mail_client_repo_host
+          ServiceInstanceName: mail-client-html5-srv
+          ServiceKeyName: mail-client-repo-host-key
+          sap.cloud.service: approuter
+        - Authentication: OAuth2UserTokenExchange
+          Name: approuter_mail_client_uaa
+          ServiceInstanceName: mail-client-xsuaa-service
+          ServiceKeyName: mail-client-uaa-key
+          sap.cloud.service: approuter
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+resources:
+- name: mail-client-db
+  type: com.sap.xs.hdi-container
+  parameters:
+    service: hana
+    service-plan: hdi-shared
+  properties:
+    hdi-service-name: ${service-name}
+- name: mail-client-repo-host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: mail-client-html5-srv
+    service-plan: app-host
+- name: mail-client-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          - Authentication: NoAuthentication
+            Name: srvurl
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://d34b60b0trial-dev-mail-client-srv.cfapps.us10.hana.ondemand.com
+            forwardAuthToken: true
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: mail-client-destination-service
+    service-plan: lite
+- name: mail-client-uaa
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: mail-client-xsuaa-service
+    service-plan: application
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+  - builder: custom
+    commands:
+    - npm ci
+    - npx -p @sap/cds-dk cds build --production

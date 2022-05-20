@@ -1,0 +1,43 @@
+###unbound Action without params
+POST http://localhost:4004/mail-api/Mail
+Content-Type: application/json
+
+{
+    "fromSender"    : "sapcoebtpgeneral@ppg.com",
+    "toRecipient"   : "cchan@ppg.com",
+    "subject"       : "DO NOT REPLY: THIS IS TEST",
+    "body"          : "Test email body content",
+    "Attachments" :[
+        {
+        "name"          : "myattachment.txt",
+        "contentType"   : "text/plain",
+        "contentBytes"  : "dGhpcyBpcyBiYXNlNjQgZW5jb2RpbmcgdGV4dCBsaW5l"            
+        }
+    ]
+}
+
+###
+DELETE http://localhost:4004/mail-api/Mail(ID=6a1f3f69-29cc-4f05-8f30-423256bf5832)
+
+###
+PATCH http://localhost:4004/admin/Mail(ID=40a16b45-34c5-4941-9947-99f1af10cabb)
+Content-Type: application/json
+
+{
+    "status" : "Error"
+}
+
+###
+GET http://localhost:4004/admin/Mail?$expand=Attachments
+
+###
+POST http://localhost:4004/admin/debug
+Content-Type: application/json
+
+{
+    "ID" : "40a16b45-34c5-4941-9947-99f1af10cabb"
+}
+
+###
+POST http://localhost:4004/admin/debug
+Content-Type: application/json

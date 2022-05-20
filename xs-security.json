@@ -1,0 +1,22 @@
+{
+    "xsappname": "mail-client",
+    "tenant-mode": "dedicated",
+    "description": "Security profile of called application",
+    "scopes": [
+        {
+            "name": "$XSAPPNAME.EmailServiceAdmin",
+            "description": "EmailServiceAdmin"
+        }
+    ],
+    "attributes": [],
+    "role-templates": [
+        {
+            "name": "EmailServiceAdmin",
+            "description": "generated",
+            "scope-references": [
+                "$XSAPPNAME.EmailServiceAdmin"
+            ],
+            "attribute-references": []
+        }
+    ]
+}
