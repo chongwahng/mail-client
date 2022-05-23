@@ -21,6 +21,9 @@ module.exports = async function (srv) {
                 const isAllowed = await checkRecipientEmailAddress(whitelists, recipient);
 
                 if (isAllowed) {
+                    let attachments = await getAttachments(req.params[0]);
+                    if (attachments) Object.assign(result, { Attachments: attachments });
+
                     await sendEmail(result)
                         .then(async () => {
                             console.log(req.params[0])
@@ -137,10 +140,10 @@ async function sendEmail(entry) {
 
         for (let i of entries) {
             fileObj.push({
-                '@odata.type'   : "#microsoft.graph.fileAttachment",
-                name            : i[1].name,
-                contentType     : i[1].contentType,
-                contentBytes    : i[1].contentBytes
+                '@odata.type': "#microsoft.graph.fileAttachment",
+                name: i[1].name,
+                contentType: i[1].contentType,
+                contentBytes: i[1].contentBytes
             });
         }
         Object.assign(payload.message, { attachments: fileObj });
@@ -167,6 +170,23 @@ async function getWhitelists() {
     const { Whitelists } = cds.entities;
     const query = SELECT.from(Whitelists);
     return await cds.run(query);
+}
+
+async function getAttachments(parentID) {
+    const { Mail_Attachments } = cds.entities;
+    let query = SELECT.from(Mail_Attachments).where({ parent_ID: parentID });
+    let result = await cds.run(query);
+
+    if (result) {
+        var attachments = [];
+
+        if (!Array.isArray(result)) {
+            attachments.push(result);
+        }
+        else attachments = result;
+
+        return attachments;
+    } else return null;
 }
 
 const wcmatch = require('wildcard-match');

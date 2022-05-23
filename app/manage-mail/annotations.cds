@@ -15,6 +15,13 @@ annotate service.Mail with {
                 @title : 'Mail System Destination';
 };
 
+annotate service.Mail_Attachments with {
+    ID           @UI.Hidden;
+    contentBytes @UI.Hidden;
+    contentType  @title : 'File Type';
+    name         @title : 'File Name';
+};
+
 annotate service.Mail with @(UI.LineItem : [
     {
         $Type              : 'UI.DataFieldForAction',
@@ -51,6 +58,21 @@ annotate service.Mail with @(UI.LineItem : [
     {
         $Type : 'UI.DataField',
         Value : destination
+    }
+]);
+
+annotate service.Mail_Attachments with @(UI.LineItem : [
+    {
+        $Type : 'UI.DataField',
+        Value : name
+    },
+    {
+        $Type : 'UI.DataField',
+        Value : contentType
+    },
+    {
+        $Type : 'UI.DataField',
+        Value : createdAt
     }
 ]);
 
@@ -114,6 +136,16 @@ annotate service.Mail with @(
             $Type  : 'UI.ReferenceFacet',
             Label  : 'Admin Information',
             Target : '@UI.FieldGroup#Admin'
+        },
+        {
+            $Type  : 'UI.ReferenceFacet',
+            Label  : 'Email Attachment',
+            Target : 'Attachments/@UI.LineItem'
         }
     ]
 );
+
+annotate service.Mail_Attachments with @(UI.HeaderInfo : {
+    TypeName       : 'Attachment',
+    TypeNamePlural : 'Attachments'
+});

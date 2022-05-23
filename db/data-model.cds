@@ -25,5 +25,5 @@ entity Mail_Attachments : cuid, managed {
     key parent       : Association to Mails;
         name         : String(200);
         contentType  : String(30);
-        contentBytes : String; // content bytes encoded in Base64
+        contentBytes : LargeString; // content bytes encoded in Base64
 }
