@@ -8,6 +8,7 @@ modules:
   path: gen/srv
   properties:
     GRAPH_API_DESTNAME: Microsoft_Graph_Mail_API
+    EMAIL_TASK_AGING_THRESHHOLD: 10
   requires:
   - name: mail-client-db
   - name: mail-client-uaa
