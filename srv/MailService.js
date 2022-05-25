@@ -59,7 +59,7 @@ module.exports = async function (srv) {
             aging = process.env.EMAIL_TASK_AGING_THRESHHOLD
         }
         else {
-            aging = 30
+            aging = 30  // default value, in case user variable not maintained
         }
 
         var today = new Date()
@@ -78,7 +78,7 @@ module.exports = async function (srv) {
             var createdAt = new Date(i[1].createdAt)
 
             if (createdAt.valueOf() < ageDate.valueOf()) {
-                query = DELETE.from(Mail_Attachments).where({ parent_ID: i[1].ID })    // remove all chil entries => attachments
+                query = DELETE.from(Mail_Attachments).where({ parent_ID: i[1].ID })    // remove all child entries => attachments
                 await cds.run(query)
 
                 query = DELETE.from(Mails).where({ ID: i[1].ID })  // remove parent entry => email task
