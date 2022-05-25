@@ -12,6 +12,7 @@ modules:
   - name: mail-client-db
   - name: mail-client-uaa
   - name: mail-client-destination-service
+  - name: mail-client-job
   provides:
   - name: srv-api
     properties:
@@ -140,6 +141,14 @@ resources:
     service: xsuaa
     service-name: mail-client-xsuaa-service
     service-plan: application
+- name: mail-client-job
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: jobscheduler
+    service-plan: lite
+    service-name: mail-client-job-service
+    config:
+      enable-xsuaa-support: true
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true

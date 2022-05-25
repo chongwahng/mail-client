@@ -41,3 +41,7 @@ Content-Type: application/json
 ###
 POST http://localhost:4004/admin/debug
 Content-Type: application/json
+
+###
+POST http://localhost:4004/mail-api/house_keep
+Content-Type: application/json
