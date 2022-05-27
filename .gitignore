@@ -17,6 +17,11 @@ target/
 *.mtar
 mta_archives/
 
+# UI 
+resources/
+app/manage-mail/dist/
+app/manage-whitelist/dist/
+
 # Other
 .DS_Store
 *.orig
