@@ -7,6 +7,9 @@ default-*.json
 gen/
 node_modules/
 target/
+app/manage-mail/dist/
+app/manage-whitelist/dist/
+resources/
 
 # Web IDE, App Studio
 .che/
@@ -16,11 +19,6 @@ target/
 *_mta_build_tmp
 *.mtar
 mta_archives/
-
-# UI 
-resources/
-app/manage-mail/dist/
-app/manage-whitelist/dist/
 
 # Other
 .DS_Store
