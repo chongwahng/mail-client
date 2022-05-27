@@ -209,16 +209,16 @@ module.exports = async function (srv) {
 
         if (Array.isArray(result)) {
             for (let i of result.entries()) {
-                setStatusImageURL(i[1])
+                setMailEntityFieldControl(i[1])
             }
         } else {
-            setStatusImageURL(result)
+            setMailEntityFieldControl(result)
         }
         console.log(result)
     })
 }
 
-function setStatusImageURL(entity) {
+function setMailEntityFieldControl(entity) {
     switch (entity.status) {
         case 'SUCCESS':
             entity.sendHidden = true
