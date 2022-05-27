@@ -5,7 +5,7 @@ module.exports = async function (srv) {
 
     console.log(`Service name: ${srv.name} is served at ${srv.path}`)
 
-    srv.on("send", async (req) => {
+    srv.on('send', async (req) => {
         console.log(`Entity action "${req.event}" invoked`)
         console.log(`ID = ${req.params[0]}`)
 
@@ -87,6 +87,74 @@ module.exports = async function (srv) {
         }
     })
 
+    srv.on('send_to_many_recipients', async (req) => {
+        console.log('action send_to_recipients invoked successfully')
+
+        const { Mails, Mail_Attachments } = cds.entities
+
+        let emails = []
+
+        for (let recipientEntry of req.data.email.toRecipients.entries()) {
+            let email = {
+                fromSender: req.data.email.fromSender,
+                toRecipient: recipientEntry[1].address,
+                subject: req.data.email.subject,
+                body: req.data.email.body,
+                destination: process.env.GRAPH_API_DESTNAME
+            }
+
+            // Create email header entry first
+            let query = INSERT.into(Mails).entries(email)
+            let result = await cds.run(query)
+
+            // Start constructing created entry of email
+            let index = emails.push(result.req.data) - 1
+            Object.assign(emails[index], { Attachments: [] })
+
+            // Now create child entries - file attachments
+            for (let attachmentEntry of req.data.email.attachments.entries()) {
+                let attachment = {
+                    parent_ID: result.req.data.ID,
+                    name: attachmentEntry[1].name,
+                    contentType: attachmentEntry[1].contentType,
+                    contentBytes: attachmentEntry[1].contentBytes
+                }
+                query = INSERT.into(Mail_Attachments).entries(attachment)
+                await cds.run(query)
+
+                emails[index].Attachments.push(attachment)
+            }
+        }
+
+        const whitelists = await getWhitelists()
+
+        // Entries created successfully, attempt to send out the email entries
+        for (let emailEntry of emails.entries()) {
+            const isAllowed = await checkRecipientEmailAddress(whitelists, emailEntry[1].toRecipient)
+
+            if (isAllowed) {
+                await sendEmail(emailEntry[1])
+                    .then(async () => {
+                        query = UPDATE(Mails).set({ status: 'SUCCESS', message: `Email sent to ${emailEntry[1].toRecipient}` }).where({ ID: emailEntry[1].ID })
+                        await cds.run(query)
+                        console.log('HTTP POST Success')
+                        console.log(`Email sent successfully!`)
+                    })
+                    .catch(async (error) => {
+                        query = UPDATE(Mails).set({ status: 'ERROR', message: `Unable to send email` }).where({ ID: emailEntry[1].ID })
+                        await cds.run(query)
+                        console.log('HTTP POST Error')
+                        console.log(error.stack)
+                        console.log(error.req._header)
+                        console.log(error.response.data.error.message)
+                    })
+            } else {
+                query = UPDATE(Mails).set({ status: 'ERROR', message: 'Recipient address not white-listed' }).where({ ID: emailEntry[1].ID })
+                await cds.run(query)
+            }
+        }
+    })
+
     srv.before('CREATE', 'Mail', async (req) => {
         if (req.data.destination === undefined) {
             Object.assign(req.data, { destination: process.env.GRAPH_API_DESTNAME })
@@ -138,7 +206,29 @@ module.exports = async function (srv) {
 
     srv.after('READ', 'Mail', (result, context) => {
         console.log('[AFTER READ]')
+
+        if (Array.isArray(result)) {
+            for (let i of result.entries()) {
+                setStatusImageURL(i[1])
+            }
+        } else {
+            setStatusImageURL(result)
+        }
+        console.log(result)
     })
+}
+
+function setStatusImageURL(entity) {
+    switch (entity.status) {
+        case 'SUCCESS':
+            entity.sendHidden = true
+            entity.statusCriticality = 3
+            break
+        case 'ERROR':
+            entity.sendHidden = false
+            entity.statusCriticality = 1
+            break
+    }
 }
 
 const cdsapi = require('@sapmentors/cds-scp-api')

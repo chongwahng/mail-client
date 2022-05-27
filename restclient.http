@@ -1,5 +1,5 @@
 ###unbound Action without params
-POST http://localhost:4004/mail-api/Mail
+POST http://localhost:4004/api/Mail
 Content-Type: application/json
 
 {
@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:4004/mail-api/Mail(ID=6a1f3f69-29cc-4f05-8f30-423256bf5832)
+DELETE http://localhost:4004/api/Mail(ID=6a1f3f69-29cc-4f05-8f30-423256bf5832)
 
 ###
 PATCH http://localhost:4004/admin/Mail(ID=40a16b45-34c5-4941-9947-99f1af10cabb)
@@ -43,5 +43,25 @@ POST http://localhost:4004/admin/debug
 Content-Type: application/json
 
 ###
-POST http://localhost:4004/mail-api/house_keep
+POST http://localhost:4004/api/house_keep
 Content-Type: application/json
+
+###
+POST http://localhost:4004/api/send_to_many_recipients
+Content-Type: application/json
+
+{
+    "email": {
+        "fromSender": "sapcoebtpgeneral@ppg.com",
+        "toRecipients": [
+            { "address": "cng@ppg.com" },
+            { "address": "chongwahng@yahoo.com" }
+        ],
+        "subject": "DO NOT REPLY: TEST",
+        "body": "This is test email body for multi recipients",
+        "attachments": [
+            { "name": "attachment-1.txt", "contentType": "text/plain", "contentBytes": "dGhpcyBpcyAxc3QgYXR0YWNobWVudCBhcyB0ZXh0" },
+            { "name": "attachment-2.txt", "contentType": "text/plain", "contentBytes": "dGhpcyBpcyAybmQgYXR0YWNobWVudCBhcyB0ZXh0" }
+        ]
+    }
+}

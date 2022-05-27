@@ -9,6 +9,7 @@ service AdminService @(
     @Capabilities.UpdateRestrictions.Updatable  : false
     @Capabilities.DeleteRestrictions.Deletable  : true
     entity Mail      as projection on db.Mails actions {
+        @(Common.IsActionCritical : true)
         action send();
     }
 
@@ -19,11 +20,12 @@ annotate AdminService.Whitelist with @odata.draft.enabled;
 
 service APIService @(
     requires : 'system-user',
-    path     : '/mail-api'
+    path     : '/api'
 ) {
 
     @insertonly
     entity Mail as projection on db.Mails;
 
     action house_keep();
+    action send_to_many_recipients(email : db.ManyRecipients)
 }
