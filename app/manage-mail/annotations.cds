@@ -24,12 +24,20 @@ annotate service.Mail_Attachments with {
 
 annotate service.Mail with @(UI.LineItem : [
     {
+        $Type                     : 'UI.DataField',
+        Value                     : status,
+        Criticality               : statusCriticality,
+        CriticalityRepresentation : #WithIcon,
+        ![@UI.Importance]         : #High
+    },
+    {
         $Type              : 'UI.DataFieldForAction',
         Label              : 'Re-Send',
         Action             : 'AdminService.send',
         InvocationGrouping : #Isolated,
         Inline             : true,
-        IconUrl            : 'sap-icon://paper-plane'
+        ![@UI.Hidden]      : sendHidden,
+        ![@UI.Importance]  : #High
     },
     {
         $Type : 'UI.DataField',
@@ -46,10 +54,6 @@ annotate service.Mail with @(UI.LineItem : [
     {
         $Type : 'UI.DataField',
         Value : body
-    },
-    {
-        $Type : 'UI.DataField',
-        Value : status
     },
     {
         $Type : 'UI.DataField',
@@ -103,8 +107,10 @@ annotate service.Mail with @(
                 Value : body,
             },
             {
-                $Type : 'UI.DataField',
-                Value : status
+                $Type                     : 'UI.DataField',
+                Value                     : status,
+                Criticality               : statusCriticality,
+                CriticalityRepresentation : #WithIcon,
             },
             {
                 $Type : 'UI.DataField',
