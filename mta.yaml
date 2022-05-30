@@ -7,8 +7,8 @@ modules:
   type: nodejs
   path: gen/srv
   properties:
-    GRAPH_API_DESTNAME: Microsoft_Graph_Mail_API
     EMAIL_TASK_AGING_THRESHHOLD: 10
+    GRAPH_API_DESTNAME: Microsoft_Graph_Mail_API
   requires:
   - name: mail-client-db
   - name: mail-client-uaa
@@ -145,11 +145,11 @@ resources:
 - name: mail-client-job
   type: org.cloudfoundry.managed-service
   parameters:
-    service: jobscheduler
-    service-plan: lite
-    service-name: mail-client-job-service
     config:
       enable-xsuaa-support: true
+    service: jobscheduler
+    service-name: mail-client-job-service
+    service-plan: lite
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true
