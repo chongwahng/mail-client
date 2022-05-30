@@ -41,6 +41,10 @@ annotate service.Mail with @(UI.LineItem : [
     },
     {
         $Type : 'UI.DataField',
+        Value : message
+    },    
+    {
+        $Type : 'UI.DataField',
         Value : subject
     },
     {
@@ -54,10 +58,6 @@ annotate service.Mail with @(UI.LineItem : [
     {
         $Type : 'UI.DataField',
         Value : body
-    },
-    {
-        $Type : 'UI.DataField',
-        Value : message
     },
     {
         $Type : 'UI.DataField',
