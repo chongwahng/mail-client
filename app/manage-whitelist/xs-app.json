@@ -16,7 +16,7 @@
     },
     {
         "source": "^/admin/",
-        "authenticationType": "none",
+        "authenticationType": "xsuaa",
         "destination": "cap-service-endpoint"
     },
     {
