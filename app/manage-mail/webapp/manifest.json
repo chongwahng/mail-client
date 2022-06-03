@@ -1,5 +1,9 @@
 {
-  "_version": "1.40.0",
+  "_version": "1.37.0",
+  "sap.cloud": {
+      "service": "mail_client_service",
+      "public": true
+  },
   "sap.app": {
     "id": "cng.com.managemail",
     "type": "application",
@@ -13,6 +17,21 @@
     "sourceTemplate": {
       "id": "@sap-ux/fiori-elements-writer:lrop",
       "version": "0.3.0"
+    },
+    "crossNavigation": {
+        "inbounds": {
+            "manage-mail": {
+                "signature": {
+                    "parameters": {},
+                    "additionalParameters": "allowed"
+                },
+                "semanticObject": "Mail",
+                "action": "Manage",
+                "title": "{{appTitle}}",
+                "subTitle": "",
+                "icon": "sap-icon://email"
+            }
+        }
     },
     "dataSources": {
       "mainService": {

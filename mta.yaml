@@ -29,7 +29,7 @@ modules:
   - name: mail-client-db
   parameters:
     buildpack: nodejs_buildpack
-- name: mail-client-app-content
+- name: mail-client-ui-deployer
   type: com.sap.application.content
   path: .
   requires:
@@ -88,12 +88,12 @@ modules:
         - Name: approuter_mail_client_repo_host
           ServiceInstanceName: mail-client-html5-srv
           ServiceKeyName: mail-client-repo-host-key
-          sap.cloud.service: approuter
+          sap.cloud.service: mail_client_service
         - Authentication: OAuth2UserTokenExchange
           Name: approuter_mail_client_uaa
           ServiceInstanceName: mail-client-xsuaa-service
           ServiceKeyName: mail-client-uaa-key
-          sap.cloud.service: approuter
+          sap.cloud.service: mail_client_service
         existing_destinations_policy: ignore
   build-parameters:
     no-source: true
@@ -113,7 +113,12 @@ resources:
     service-plan: app-host
 - name: mail-client-destination-service
   type: org.cloudfoundry.managed-service
+  requires:
+    - name: srv-api
   parameters:
+    service: destination
+    service-name: mail-client-destination-service
+    service-plan: lite
     config:
       HTML5Runtime_enabled: true
       init_data:
@@ -125,16 +130,13 @@ resources:
             Type: HTTP
             URL: https://ui5.sap.com
           - Authentication: NoAuthentication
-            Name: srvurl
+            Name: cap-service-endpoint
             ProxyType: Internet
             Type: HTTP
-            URL: https://d34b60b0trial-dev-mail-client-srv.cfapps.us10.hana.ondemand.com
+            URL: ~{srv-api/srv-url}
+            HTML5.DynamicDestination: true
             forwardAuthToken: true
           existing_destinations_policy: update
-      version: 1.0.0
-    service: destination
-    service-name: mail-client-destination-service
-    service-plan: lite
 - name: mail-client-uaa
   type: org.cloudfoundry.managed-service
   parameters:

@@ -15,16 +15,9 @@
       "destination": "ui5"
     },
     {
-        "source": "^/admin/(.*)$",
-        "target": "/admin/$1",
-        "authenticationType": "xsuaa",
-        "destination": "srvurl"
-    },
-    {
-        "source": "^/admin",
-        "target": "/admin",
-        "authenticationType": "xsuaa",
-        "destination": "srvurl"
+        "source": "^/admin/",
+        "authenticationType": "none",
+        "destination": "cap-service-endpoint"
     },
     {
       "source": "^(.*)$",
